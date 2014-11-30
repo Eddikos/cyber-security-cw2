@@ -25,11 +25,28 @@
 		public function login($username,$password) {
 			$f3=Base::instance();						
 			$db = $this->controller->db;
-			$results = $db->query("SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'");
-			if (!empty($results)) {		
-				$user = $results[0];	
-				$this->setupSession($user);
-				return $this->forceLogin($user);
+
+			// Another way to do the check, as for the Search bar, however doens't work
+			// $results = $this->controller->db->connection->prepare("SELECT * FROM `users` WHERE `username`=':username' AND `password`=':password'");
+			// $results->execute(array('username' => $username, 'password' => $password));
+			// $results = get_object_vars($results);
+
+			// Previous code
+			//$results = $db->query("SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'");
+			
+			// Using FatFree syntax, separate the variables from the actual query
+			$f3->set('user', $username);
+			$f3->set('password', $password);
+			$results = $db->connection->exec("SELECT * FROM `users` WHERE `username`= :user AND `password`= :password",
+												array(':user'=>$f3->get('user'),':password'=>$f3->get('password')));
+			
+			if (!empty($results)) {	
+					if (isset($results[0])){
+						$user = $results[0];	
+						$this->setupSession($user);
+						return $this->forceLogin($user);
+					}
+				
 			} 
 			return false;
 		}

@@ -3,7 +3,7 @@ class Blog extends Controller {
 	
 	public function index($f3) {	
 		if ($f3->exists('PARAMS.3')) {
-			$categoryid = $f3->get('PARAMS.3');
+			$categoryid = $f3->clean($f3->get('PARAMS.3'));
 			$category = $this->Model->Categories->fetch($categoryid);
 			$postlist = array_values($this->Model->Post_Categories->fetchList(array('id','post_id'),array('category_id' => $categoryid)));
 			$posts = $this->Model->Posts->fetchAll(array('id' => $postlist, 'published' => 'IS NOT NULL'),array('order' => 'published DESC'));
@@ -18,7 +18,7 @@ class Blog extends Controller {
 	}
 
 	public function view($f3) {
-		$id = $f3->get('PARAMS.3');
+		$id = $f3->clean($f3->get('PARAMS.3'));
 		if(empty($id)) {
 			return $f3->reroute('/');
 		}
@@ -51,7 +51,7 @@ class Blog extends Controller {
 	}
 
 	public function comment($f3) {
-		$id = $f3->get('PARAMS.3');
+		$id = $f3->clean($f3->get('PARAMS.3'));
 		$post = $this->Model->Posts->fetch($id);
 		if($this->request->is('post')) {
 			$comment = $this->Model->Comments;
@@ -68,7 +68,9 @@ class Blog extends Controller {
 
 			//Default subject
 			if(empty($this->request->data['subject'])) {
-				$comment->subject = 'RE: ' . $post->title;
+				$comment->subject = 'RE: ' . $f3->clean($post->title);
+			} else {
+				$comment->subject = $f3->clean($this->request->data['subject']);
 			}
 
 			$comment->save();
@@ -84,7 +86,7 @@ class Blog extends Controller {
 	}
 
 	public function moderate($f3) {
-		list($id,$option) = explode("/",$f3->get('PARAMS.3'));
+		list($id,$option) = explode("/",$f3->clean($f3->get('PARAMS.3')));
 		$comments = $this->Model->Comments;
 		$comment = $comments->fetch($id);
 
@@ -105,10 +107,22 @@ class Blog extends Controller {
 		if($this->request->is('post')) {
 			extract($this->request->data);
 			$f3->set('search',$search);
-
+			// Just use this function to clean it before using!!!!!!!!!!
+			$search = htmlspecialchars($search, ENT_QUOTES, 'UTF-8');
 			//Get search results
-			$search = str_replace("*","%",$search); //Allow * as wildcard
+			$search = $f3->clean(str_replace("*","%",$search)); //Allow * as wildcard
+
+
+			// Different ways I tried to do it :(
+			//$ids = $this->db->connection->prepare("SELECT id FROM `posts` WHERE `title` LIKE \"%:search%\" OR `content` LIKE '%:search%'");
+			//$ids->execute(array('search' => $search));
+			//$ids = get_object_vars($ids);
+			//$ids = $this->db->connection->exec("SELECT id FROM `posts` WHERE `title` LIKE \"%:search%\" OR `content` LIKE '%:search%'", array(':search'=>$search, ':search'=>$search));
+			
+			// Previous code
 			$ids = $this->db->connection->exec("SELECT id FROM `posts` WHERE `title` LIKE \"%$search%\" OR `content` LIKE '%$search%'");
+			
+
 			$ids = Hash::extract($ids,'{n}.id');
 			if(empty($ids)) {
 				StatusMessage::add('No search results found for ' . $search); 

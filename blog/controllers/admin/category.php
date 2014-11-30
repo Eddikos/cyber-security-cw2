@@ -17,7 +17,7 @@
 		public function add($f3) {
 			if($this->request->is('post')) {
 				$category = $this->Model->Categories;
-				$category->title = $this->request->data['title'];
+				$category->title = $f3->clean($this->request->data['title']);
 				$category->save();
 
 				\StatusMessage::add('Category added succesfully','success');
@@ -26,7 +26,7 @@
 		}
 
 		public function delete($f3) {
-			$categoryid = $f3->get('PARAMS.3');
+			$categoryid = $f3->clean($f3->get('PARAMS.3'));
 			$category = $this->Model->Categories->fetchById($categoryid);
 			$category->erase();
 
@@ -39,10 +39,10 @@
 		}
 
 		public function edit($f3) {
-			$categoryid = $f3->get('PARAMS.3');
+			$categoryid = $f3->clean($f3->get('PARAMS.3'));
 			$category = $this->Model->Categories->fetchById($categoryid);
 			if($this->request->is('post')) {
-				$category->title = $this->request->data['title'];
+				$category->title = $f3->clean($this->request->data['title']);
 				$category->save();
 				\StatusMessage::add('Category updated succesfully','success');
 				return $f3->reroute('/admin/category');

@@ -3,8 +3,8 @@
 class Api extends Controller {
 	
 	public function display($f3) {
-		extract($f3->get('PARAMS'));
-		extract($f3->get('GET'));
+		extract($f3->clean($f3->get('PARAMS')));
+		extract($f3->clean($f3->get('GET')));
 
 		//Check for authentication token and fail without
 		if(!isset($token) || $token != $f3->get('site.apikey')) {

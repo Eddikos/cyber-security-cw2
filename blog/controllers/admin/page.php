@@ -11,20 +11,26 @@ class Page extends AdminController {
 
 	public function add($f3) {
 		if($this->request->is('post')) {
-			$pagename = strtolower(str_replace(" ","_",$this->request->data['title']));
-			$this->Model->Pages->create($pagename);
-		
-			\StatusMessage::add('Page created succesfully','success');
-			return $f3->reroute('/admin/page/edit/' . $pagename);
+			//$pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
+			$pagename = trim($f3->clean(strtolower($this->request->data['title'])));
+
+			if ($pagename == ''){
+				\StatusMessage::add('Empty Page name is not accepted','danger');
+				return $f3->reroute('/admin/page/');
+			} else {
+				$this->Model->Pages->create($pagename);
+				\StatusMessage::add('Page created succesfully','success');
+				return $f3->reroute('/admin/page/edit/' . $pagename);
+			}
 		}
 	}
 
 	public function edit($f3) {
-		$pagename = $f3->get('PARAMS.3');
+		$pagename = $f3->clean($f3->get('PARAMS.3'));
 		if ($this->request->is('post')) {
 			$pages = $this->Model->Pages;
 			$pages->title = $pagename;
-			$pages->content = $this->request->data['content'];
+			$pages->content = $f3->clean($this->request->data['content']);
 			$pages->save();
 
 			\StatusMessage::add('Page updated succesfully','success');
@@ -38,12 +44,11 @@ class Page extends AdminController {
 	}
 
 	public function delete($f3) {
-		$pagename = $f3->get('PARAMS.3');
+		$pagename = $f3->clean($f3->get('PARAMS.3'));
 		$this->Model->Pages->delete($pagename);	
 		\StatusMessage::add('Page deleted succesfully','success');
 		return $f3->reroute('/admin/page');	
 	}
-
 }
 
 ?>

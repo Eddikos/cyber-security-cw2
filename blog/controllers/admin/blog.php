@@ -12,7 +12,7 @@
 		}
 
 		public function delete($f3) {
-			$postid = $f3->get('PARAMS.3');
+			$postid = $f3->clean($f3->get('PARAMS.3'));
 			$post = $this->Model->Posts->fetchById($postid);
 			$post->erase();
 
@@ -30,9 +30,9 @@
 			if($this->request->is('post')) {
 				$post = $this->Model->Posts;
 				extract($this->request->data);
-				$post->title = $title;
+				$post->title = $f3->clean($title);
 				$post->content = $content;
-				$post->summary = $summary;
+				$post->summary = $f3->clean($summary);
 				$post->user_id = $this->Auth->user('id');	
 				$post->created = $post->modified = mydate();
 
@@ -65,15 +65,20 @@
 		}
 
 		public function edit($f3) {
-			$postid = $f3->get('PARAMS.3');
+			$postid = $f3->clean($f3->get('PARAMS.3'));
 			$post = $this->Model->Posts->fetchById($postid);
 			$blog = $this->Model->map($post,array('post_id','Post_Categories','category_id'),'Categories',false);
 			if ($this->request->is('post')) {
 				extract($this->request->data);
 				$post->copyfrom('POST');
+
 				$post->modified = mydate();
 				$post->user_id = $this->Auth->user('id');
-				
+				$post->title = $f3->clean($this->request->data['title']);
+				$post->summary = $f3->clean($this->request->data['summary']);
+				$post->content = $this->request->data['content'];
+				$post->published = $f3->clean($this->request->data['published']);
+
 				//Determine whether to publish or draft
 				if(!isset($Publish)) {
 					$post->published = null;

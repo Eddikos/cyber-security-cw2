@@ -2,7 +2,7 @@
 class User extends Controller {
 	
 	public function view($f3) {
-		$userid = $f3->get('PARAMS.3');
+		$userid = $f3->clean($f3->get('PARAMS.3'));
 		$u = $this->Model->Users->fetch($userid);
 
 		$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));
@@ -68,6 +68,7 @@ class User extends Controller {
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');
 
+			$u->displayname = $f3->clean($this->request->data['displayname']);
 			//Handle avatar upload
 			if(isset($_FILES['avatar']) && isset($_FILES['avatar']['tmp_name']) && !empty($_FILES['avatar']['tmp_name'])) {
 				$url = File::Upload($_FILES['avatar']);
