@@ -14,6 +14,8 @@ class User extends Controller {
 	}
 
 	public function add($f3) {
+		//Start the instance of the F3 Encryption
+		$bEncrypt = \bEncrypt::instance();
 		if($this->request->is('post')) {
 			extract($this->request->data);
 			$check = $this->Model->Users->fetch(array('username' => $username));
@@ -30,6 +32,9 @@ class User extends Controller {
 				if(empty($displayname)) {
 					$user->displayname = $user->username;
 				}
+
+				// Encrypt the password before passing it to the database
+				$user->password = $bEncrypt->hash($user->password,null, 10);
 				$user->save();	
 				StatusMessage::add('Registration complete','success');
 				return $f3->reroute('/user/login');
@@ -39,7 +44,7 @@ class User extends Controller {
 
 	public function login($f3) {
 		if ($this->request->is('post')) {
-			list($username,$password, $captcha) = array($this->request->data['username'], $this->request->data['password'], $this->request->data['captcha']);
+			list($username, $password, $captcha) = array($this->request->data['username'], $this->request->data['password'], $this->request->data['captcha']);
 			if (trim($captcha) == ''){
 					StatusMessage::add('You need to provide captcha as well','danger');
 			} elseif ($captcha == $_SESSION['captcha_code']){
@@ -68,9 +73,16 @@ class User extends Controller {
 
 
 	public function profile($f3) {	
+		//Start the instance of the F3 Encryption
+		$bEncrypt = \Bcrypt::instance();
+
 		$id = $this->Auth->user('id');
 		extract($this->request->data);
 		$u = $this->Model->Users->fetch($id);
+
+		// Store previous password to be used for checking later on
+		$oldPassword = $u->password;
+
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');
 
@@ -81,6 +93,14 @@ class User extends Controller {
 				$u->avatar = $url;
 			} else if(isset($reset)) {
 				$u->avatar = '';
+			}
+
+			// Check whether entered new password is the same as the old one, or wasn't changed at all, 
+			// It is done to avoid Double Hashing
+			if ($this->request->data['password'] !== $oldPassword && $bEncrypt->hash($this->request->data['password'],null, 10) !== $oldPassword) {
+			    $u->password = $bEncrypt->hash($u->password, null, 10);
+			} else { 
+			    $u->password = $oldPassword;
 			}
 
 			$u->save();

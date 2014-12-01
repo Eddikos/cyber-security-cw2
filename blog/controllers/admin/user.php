@@ -10,10 +10,26 @@ class User extends AdminController {
 	}
 
 	public function edit($f3) {	
+		//Start the instance of the F3 Encryption
+		$bEncrypt = \Bcrypt::instance();
+
 		$id = $f3->get('PARAMS.3');
 		$u = $this->Model->Users->fetch($id);
+
+		// Store previous password to be used for checking later on
+		$oldPassword = $u->password;
+		
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');
+
+			// Check whether entered new password is the same as the old one, or wasn't changed at all, 
+			// It is done to avoid Double Hashing
+			if ($this->request->data['password'] !== $oldPassword && $bEncrypt->hash($this->request->data['password'],null, 10) !== $oldPassword) {
+			    $u->password = $bEncrypt->hash($u->password, null, 10);
+			} else { 
+			    $u->password = $oldPassword;
+			}
+
 			$u->save();
 			\StatusMessage::add('User updated succesfully','success');
 			return $f3->reroute('/admin/user');

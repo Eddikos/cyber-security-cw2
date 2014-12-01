@@ -23,7 +23,11 @@
 
 		/** Look up user by username and password and log them in */
 		public function login($username,$password) {
-			$f3=Base::instance();						
+			$f3=Base::instance();
+
+			//Start the instance of the F3 Encryption
+			$bEncrypt = \Bcrypt::instance();
+
 			$db = $this->controller->db;
 
 			// Another way to do the check, as for the Search bar, however doens't work
@@ -37,14 +41,15 @@
 			// Using FatFree syntax, separate the variables from the actual query
 			$f3->set('user', $username);
 			$f3->set('password', $password);
-			$results = $db->connection->exec("SELECT * FROM `users` WHERE `username`= :user AND `password`= :password",
-												array(':user'=>$f3->get('user'),':password'=>$f3->get('password')));
+			$results = $db->connection->exec("SELECT * FROM `users` WHERE `username`= :user ",
+												array(':user'=>$f3->get('user')));
 			
+			// Verify the encryption first, and only then allow to login
 			if (!empty($results)) {	
-					if (isset($results[0])){
-						$user = $results[0];	
-						$this->setupSession($user);
-						return $this->forceLogin($user);
+					if($bEncrypt->verify($f3->get('password'), $results[0]['password'])===true) {
+					    $user = $results[0]; 
+					    $this->setupSession($user);
+					    return $this->forceLogin($user);
 					}
 				
 			} 
