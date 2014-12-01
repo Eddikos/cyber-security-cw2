@@ -39,17 +39,23 @@ class User extends Controller {
 
 	public function login($f3) {
 		if ($this->request->is('post')) {
-			list($username,$password) = array($this->request->data['username'],$this->request->data['password']);
-			if ($this->Auth->login($username,$password)) {
-				StatusMessage::add('Logged in succesfully','success');
-			
-				if(isset($_GET['from'])) {
-					$f3->reroute($_GET['from']);
+			list($username,$password, $captcha) = array($this->request->data['username'], $this->request->data['password'], $this->request->data['captcha']);
+			if (trim($captcha) == ''){
+					StatusMessage::add('You need to provide captcha as well','danger');
+			} elseif ($captcha == $_SESSION['captcha_code']){
+				if ($this->Auth->login($username,$password)) {
+					StatusMessage::add('Logged in succesfully','success');
+				
+					if(isset($_GET['from'])) {
+						$f3->reroute($_GET['from']);
+					} else {
+						$f3->reroute('/');	
+					}
 				} else {
-					$f3->reroute('/');	
+					StatusMessage::add('Invalid username or password','danger');
 				}
 			} else {
-				StatusMessage::add('Invalid username or password','danger');
+				StatusMessage::add('Invalid captcha','danger');
 			}
 		}		
 	}

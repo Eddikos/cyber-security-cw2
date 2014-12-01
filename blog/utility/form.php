@@ -87,6 +87,14 @@ toolbarGroups: [
 		";
 	}
 
+	public function captcha(){
+
+
+		return "
+				<label for='code'>Security Code</label>
+				<input class='form-control' type='text' name='code'/>
+				<p>{@message}</p>";
+	}
 
 	public function password($options) {
 		return '<input type="password" class="form-control" id="' . $options['field'] . '" name="' . $options['field'] . '" placeholder="' . $options['placeholder'] . '" value="' . $options['value'] . '">';
