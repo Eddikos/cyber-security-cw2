@@ -26,7 +26,7 @@ class Page extends AdminController {
 	}
 
 	public function edit($f3) {
-		$pagename = $f3->clean($f3->get('PARAMS.3'));
+		$pagename = $f3->get('PARAMS.3');
 		if ($this->request->is('post')) {
 			$pages = $this->Model->Pages;
 			$pages->title = $pagename;
@@ -44,7 +44,7 @@ class Page extends AdminController {
 	}
 
 	public function delete($f3) {
-		$pagename = $f3->clean($f3->get('PARAMS.3'));
+		$pagename = $f3->get('PARAMS.3');
 		$this->Model->Pages->delete($pagename);	
 		\StatusMessage::add('Page deleted succesfully','success');
 		return $f3->reroute('/admin/page');	

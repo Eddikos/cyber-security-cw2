@@ -2,7 +2,7 @@
 class User extends Controller {
 	
 	public function view($f3) {
-		$userid = $f3->clean($f3->get('PARAMS.3'));
+		$userid = $f3->get('PARAMS.3');
 		$u = $this->Model->Users->fetch($userid);
 
 		$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));

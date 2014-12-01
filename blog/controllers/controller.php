@@ -34,6 +34,15 @@ class Controller {
 		$this->Settings = $settings;
 		$f3->set('site',$settings);
 
+		$params = $f3->get('PARAMS');
+		 if(!empty($params)){
+		   	foreach($params as $key => $value){
+		    	$params[$key] = $f3->clean($value);
+		   	}
+		  $f3->set('PARAMS', $params);
+		}
+
+		
 		//Extract request data
 		extract($this->request->data);
 

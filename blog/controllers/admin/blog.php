@@ -12,7 +12,7 @@
 		}
 
 		public function delete($f3) {
-			$postid = $f3->clean($f3->get('PARAMS.3'));
+			$postid = $f3->get('PARAMS.3');
 			$post = $this->Model->Posts->fetchById($postid);
 			$post->erase();
 
@@ -65,7 +65,7 @@
 		}
 
 		public function edit($f3) {
-			$postid = $f3->clean($f3->get('PARAMS.3'));
+			$postid = $f3->get('PARAMS.3');
 			$post = $this->Model->Posts->fetchById($postid);
 			$blog = $this->Model->map($post,array('post_id','Post_Categories','category_id'),'Categories',false);
 			if ($this->request->is('post')) {

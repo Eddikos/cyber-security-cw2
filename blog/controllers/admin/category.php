@@ -26,7 +26,7 @@
 		}
 
 		public function delete($f3) {
-			$categoryid = $f3->clean($f3->get('PARAMS.3'));
+			$categoryid = $f3->get('PARAMS.3');
 			$category = $this->Model->Categories->fetchById($categoryid);
 			$category->erase();
 
@@ -39,7 +39,7 @@
 		}
 
 		public function edit($f3) {
-			$categoryid = $f3->clean($f3->get('PARAMS.3'));
+			$categoryid = $f3->get('PARAMS.3');
 			$category = $this->Model->Categories->fetchById($categoryid);
 			if($this->request->is('post')) {
 				$category->title = $f3->clean($this->request->data['title']);
