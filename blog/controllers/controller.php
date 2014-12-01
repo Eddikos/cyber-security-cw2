@@ -34,12 +34,14 @@ class Controller {
 		$this->Settings = $settings;
 		$f3->set('site',$settings);
 
-		$params = $f3->get('PARAMS');
-		 if(!empty($params)){
-		   	foreach($params as $key => $value){
-		    	$params[$key] = $f3->clean($value);
+		// Fetch all available parameters from URL and Clean them up
+		// And then return back to the array of PARAMS
+		$parameters = $f3->get('PARAMS');
+		 if(!empty($parameters)){
+		   	foreach($parameters as $key => $value){
+		    	$parameters[$key] = $f3->clean($value);
 		   	}
-		  $f3->set('PARAMS', $params);
+		  $f3->set('PARAMS', $parameters);
 		}
 
 		
