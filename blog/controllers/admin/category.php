@@ -17,11 +17,21 @@
 		public function add($f3) {
 			if($this->request->is('post')) {
 				$category = $this->Model->Categories;
-				$category->title = $f3->clean($this->request->data['title']);
-				$category->save();
+				
 
-				\StatusMessage::add('Category added succesfully','success');
-				return $f3->reroute('/admin/category');
+				//$pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
+				$categoryName = trim($f3->clean(strtolower($this->request->data['title'])));
+
+				if ($categoryName == ''){
+					\StatusMessage::add('Empty Category name is not accepted','danger');
+					return $f3->reroute('/admin/category');
+				} else {
+					$category->title = $f3->clean($this->request->data['title']);
+					$category->save();
+
+					\StatusMessage::add('Category added succesfully','success');
+					return $f3->reroute('/admin/category');
+				}
 			}
 		}
 
