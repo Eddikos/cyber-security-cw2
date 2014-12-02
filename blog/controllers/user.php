@@ -15,7 +15,7 @@ class User extends Controller {
 
 	public function add($f3) {
 		//Start the instance of the F3 Encryption
-		$bEncrypt = \bEncrypt::instance();
+		$bEncrypt = \Bcrypt::instance();
 		if($this->request->is('post')) {
 			extract($this->request->data);
 			$check = $this->Model->Users->fetch(array('username' => $username));

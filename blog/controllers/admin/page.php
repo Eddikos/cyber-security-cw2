@@ -11,8 +11,12 @@ class Page extends AdminController {
 
 	public function add($f3) {
 		if($this->request->is('post')) {
-			//$pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
 			$pagename = trim($f3->clean(strtolower($this->request->data['title'])));
+
+			// Sanitze the input in prder to have clean URLs
+			$pagename = sanitize_input($pagename);
+			//$pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
+			
 
 			if ($pagename == ''){
 				\StatusMessage::add('Empty Page name is not accepted','danger');
