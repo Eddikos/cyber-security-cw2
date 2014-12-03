@@ -107,30 +107,19 @@ class Blog extends Controller {
 		if($this->request->is('post')) {
 			extract($this->request->data);
 			$f3->set('search',$search);
-			// Just use this function to clean it before using!!!!!!!!!!
-			$search = htmlspecialchars($search, ENT_QUOTES, 'UTF-8');
-			//Get search results
-			$search = $f3->clean(str_replace("*","%",$search)); //Allow * as wildcard
 
-
-			// Different ways I tried to do it :(
-			//$ids = $this->db->connection->prepare("SELECT id FROM `posts` WHERE `title` LIKE \"%:search%\" OR `content` LIKE '%:search%'");
-			//$ids->execute(array('search' => $search));
-			//$ids = get_object_vars($ids);
-			//$ids = $this->db->connection->exec("SELECT id FROM `posts` WHERE `title` LIKE \"%:search%\" OR `content` LIKE '%:search%'", array(':search'=>$search, ':search'=>$search));
+			$search = str_replace("*","%",$search); //Allow * as wildcard
+			// Prepare the Taken from http://fatfreeframework.com/sql-mapper
+			$searchQuery = '%'.$search.'%';
+			// Make a query using predefined method from database
+			$posts = $this->Model->Posts->find(array('title LIKE ? OR content LIKE ?', $searchQuery, $searchQuery));
 			
-			// Previous code
-			$ids = $this->db->connection->exec("SELECT id FROM `posts` WHERE `title` LIKE \"%$search%\" OR `content` LIKE '%$search%'");
-			
-
-			$ids = Hash::extract($ids,'{n}.id');
-			if(empty($ids)) {
+			if(empty($posts)) {
 				StatusMessage::add('No search results found for ' . $search); 
 				return $f3->reroute('/blog/search');
 			}
 
 			//Load associated data
-			$posts = $this->Model->Posts->fetchAll(array('id' => $ids));
 			$blogs = $this->Model->map($posts,'user_id','Users');
 			$blogs = $this->Model->map($posts,array('post_id','Post_Categories','category_id'),'Categories',false,$blogs);
 

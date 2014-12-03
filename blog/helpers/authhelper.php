@@ -39,15 +39,18 @@
 			//$results = $db->query("SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'");
 			
 			// Using FatFree syntax, separate the variables from the actual query
-			$f3->set('user', $username);
+			$f3->set('username', $username);
 			$f3->set('password', $password);
-			$results = $db->connection->exec("SELECT * FROM `users` WHERE `username`= :user ",
-												array(':user'=>$f3->get('user')));
-			
+			$results = $this->controller->Model->Users->fetch(array('username' => $username));
+
+			// Another way to prevent SQL injection, but it still uses Query to database
+			// $results = $db->connection->exec("SELECT * FROM `users` WHERE `username`= :username ",
+			//									array(':username'=>$f3->get('username')));		
+			$results = $results->cast();
 			// Verify the encryption first, and only then allow to login
 			if (!empty($results)) {	
-					if($bEncrypt->verify($f3->get('password'), $results[0]['password'])===true) {
-					    $user = $results[0]; 
+					if($bEncrypt->verify($f3->get('password'), $results['password'])===true) {
+					    $user = $results; 
 					    $this->setupSession($user);
 					    return $this->forceLogin($user);
 					}
