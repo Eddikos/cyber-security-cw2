@@ -6,16 +6,21 @@ class Page extends AdminController {
 
 	public function index($f3) {
 		$pages = $this->Model->Pages->fetchAll();
+		//$dude = 4;
 		$f3->set('pages',$pages);
+		//$f3->set('dude', $dude );
+		//var_dump($f3->get('dude'));
+		//var_dump($f3->dbtype());
+		//var_dump($this->get('csrf'));
 	}
 
 	public function add($f3) {
 		if($this->request->is('post')) {
-			$pagename = trim($f3->clean(strtolower($this->request->data['title'])));
+			$pagename = trim($f3->clean($this->request->data['title']));
 
 			// Sanitze the input in prder to have clean URLs
 			$pagename = sanitize_input($pagename);
-			//$pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
+			// $pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
 			
 
 			if ($pagename == ''){
@@ -34,7 +39,7 @@ class Page extends AdminController {
 		if ($this->request->is('post')) {
 			$pages = $this->Model->Pages;
 			$pages->title = $pagename;
-			$pages->content = $f3->clean($this->request->data['content']);
+			$pages->content = $this->request->data['content'];
 			$pages->save();
 
 			\StatusMessage::add('Page updated succesfully','success');

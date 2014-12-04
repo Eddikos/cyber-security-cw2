@@ -24,17 +24,11 @@
 		/** Look up user by username and password and log them in */
 		public function login($username,$password) {
 			$f3=Base::instance();
-
 			//Start the instance of the F3 Encryption
 			$bEncrypt = \Bcrypt::instance();
 
 			$db = $this->controller->db;
-
-			// Another way to do the check, as for the Search bar, however doens't work
-			// $results = $this->controller->db->connection->prepare("SELECT * FROM `users` WHERE `username`=':username' AND `password`=':password'");
-			// $results->execute(array('username' => $username, 'password' => $password));
-			// $results = get_object_vars($results);
-
+			
 			// Previous code
 			//$results = $db->query("SELECT * FROM `users` WHERE `username`='$username' AND `password`='$password'");
 			
