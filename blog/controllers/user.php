@@ -107,13 +107,34 @@ class User extends Controller {
 			$u->copyfrom('POST');
 
 			$u->displayname = $f3->clean($this->request->data['displayname']);
+
+
 			//Handle avatar upload
-			if(isset($_FILES['avatar']) && isset($_FILES['avatar']['tmp_name']) && !empty($_FILES['avatar']['tmp_name'])) {
-				$url = File::Upload($_FILES['avatar']);
-				$u->avatar = $url;
-			} else if(isset($reset)) {
-				$u->avatar = '';
+			// List of allowed extensions to be uploaded
+			$validExtensions = array(
+				'png' => 'image/png',
+				'jpeg' =>'image/jpeg',
+			    'jpg' => 'image/jpeg',
+			    'bmp' => 'image/bmp',
+			    'gif' => 'image/gif'
+			);
+
+
+			if(isset($_FILES['avatar']) && isset($_FILES['avatar']['tmp_name']) && !empty($_FILES['avatar']['tmp_name']) && $_FILES['avatar']['error'] == false) {
+			    $filename = basename($_FILES['avatar']['name']);
+			    // Get the last extension of the file
+			    $lastExt = (new SplFileInfo($filename))->getExtension();
+			    
+			    // Check whether last extension of the file is 
+			    if(array_key_exists($lastExt, $validExtensions) === true && ($_FILES['avatar']['type']) === $validExtensions[$lastExt]){ 
+			     	$url = File::Upload($_FILES['avatar']);
+			     	$u->avatar = $url;
+			    }else{
+			     	\StatusMessage::add('Invalid file extension','danger');
+			    }
 			}
+
+
 
 			// Check whether entered new password is the same as the old one, or wasn't changed at all, 
 			// It is done to avoid Double Hashing
