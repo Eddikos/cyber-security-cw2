@@ -16,7 +16,8 @@ class Contact extends Controller {
 				StatusMessage::add('Subject and Message has to be at least 5 characters long','danger');
 			} else {
 				$from = "From: $from";
-				//$to = "root@localhost";
+				$site = $f3->get('site');
+				$to = $site['email'];
 				mail($to,$subject,$message,$from);
 
 				StatusMessage::add('Thank you for contacting us');
