@@ -107,24 +107,28 @@ class Blog extends Controller {
 		if($this->request->is('post')) {
 			extract($this->request->data);
 			$f3->set('search',$search);
-
-			$search = str_replace("*","%",$search); //Allow * as wildcard
-			// Prepare the Taken from http://fatfreeframework.com/sql-mapper
-			$searchQuery = '%'.$search.'%';
-			// Make a query using predefined method from database
-			$posts = $this->Model->Posts->find(array('title LIKE ? OR content LIKE ?', $searchQuery, $searchQuery));
 			
-			if(empty($posts)) {
-				StatusMessage::add('No search results found for ' . $search); 
-				return $f3->reroute('/blog/search');
-			}
+			if (trim($search) == ''){
+					StatusMessage::add('Empty filed is being submitted/searched for','danger');
+			} else {
+				$search = str_replace("*","%",$search); //Allow * as wildcard
+				// Prepare the Taken from http://fatfreeframework.com/sql-mapper
+				$searchQuery = '%'.$search.'%';
+				// Make a query using predefined method from database
+				$posts = $this->Model->Posts->find(array('title LIKE ? OR content LIKE ?', $searchQuery, $searchQuery));
+				
+				if(empty($posts)) {
+					StatusMessage::add('No search results found for ' . $search); 
+					return $f3->reroute('/blog/search');
+				}
 
-			//Load associated data
-			$blogs = $this->Model->map($posts,'user_id','Users');
-			$blogs = $this->Model->map($posts,array('post_id','Post_Categories','category_id'),'Categories',false,$blogs);
+				//Load associated data
+				$blogs = $this->Model->map($posts,'user_id','Users');
+				$blogs = $this->Model->map($posts,array('post_id','Post_Categories','category_id'),'Categories',false,$blogs);
 
-			$f3->set('blogs',$blogs);
-			$this->action = 'results';	
+				$f3->set('blogs',$blogs);
+				$this->action = 'results';
+			}	
 		}
 	}
 }

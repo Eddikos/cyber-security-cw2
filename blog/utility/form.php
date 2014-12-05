@@ -88,12 +88,9 @@ toolbarGroups: [
 	}
 
 	public function captcha(){
-
-
-		return "
-				<label for='code'>Security Code</label>
-				<input class='form-control' type='text' name='code'/>
-				<p>{@message}</p>";
+		$img = new Image();
+		$img->captcha('captcha.ttf',16,7,'SESSION.captcha_code');
+		return "<img src='data:image/png;base64,".base64_encode($img->dump())."' /><br/><br/>";
 	}
 
 	public function password($options) {

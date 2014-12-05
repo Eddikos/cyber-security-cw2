@@ -18,27 +18,47 @@ class User extends Controller {
 		$bEncrypt = \Bcrypt::instance();
 		if($this->request->is('post')) {
 			extract($this->request->data);
-			$check = $this->Model->Users->fetch(array('username' => $username));
-			if (!empty($check)) {
-				StatusMessage::add('User already exists','danger');
-			} else if($password != $password2) {
-				StatusMessage::add('Passwords must match','danger');
-			} else {
-				$user = $this->Model->Users;
-				$user->copyfrom('POST');
-				$user->created = mydate();
-				$user->bio = '';
-				$user->level = 1;
-				if(empty($displayname)) {
-					$user->displayname = $user->username;
-				}
+			list($captcha, $username, $displayname, $email, $password, $password2) = array(trim($this->request->data['captcha']), 
+									trim($this->request->data['username']), 
+									trim($this->request->data['displayname']), 
+									trim($this->request->data['email']), 
+									trim($this->request->data['password']), 
+									trim($this->request->data['password2']));
 
-				// Encrypt the password before passing it to the database
-				$user->password = $bEncrypt->hash($user->password,null, 10);
-				$user->save();	
-				StatusMessage::add('Registration complete','success');
-				return $f3->reroute('/user/login');
+			if ($captcha == '' || $username == '' || $displayname == '' || $email == '' || $password == '' || $password2 == ''){
+				StatusMessage::add('All fields needs to be filled in!','danger');
+			} elseif(strlen($username) <= 3 || strlen($displayname) <= 3){
+				StatusMessage::add('Names have to be more than 3 characters long','danger');
+			} elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
+				StatusMessage::add('Email is not valid','danger');
+			} elseif(strlen($password) <= 3){
+				StatusMessage::add('Password has to be at least 3 characters long','danger');
+			} elseif($password !== $password2){
+				StatusMessage::add('Passwords must match','danger');
+			} elseif ($captcha == $_SESSION['captcha_code']){
+				$check = $this->Model->Users->fetch(array('username' => $username));
+				if (!empty($check)) {
+					StatusMessage::add('User already exists','danger');
+				} else {
+					$user = $this->Model->Users;
+					$user->copyfrom('POST');
+					$user->created = mydate();
+					$user->bio = '';
+					$user->level = 1;
+					if(empty($displayname)) {
+						$user->displayname = $user->username;
+					}
+
+					// Encrypt the password before passing it to the database
+					$user->password = $bEncrypt->hash($user->password,null, 10);
+					$user->save();	
+					StatusMessage::add('Registration complete','success');
+					return $f3->reroute('/user/login');
+				}
+			} else {
+				StatusMessage::add('Invalid captcha','danger');
 			}
+			
 		}
 	}
 
