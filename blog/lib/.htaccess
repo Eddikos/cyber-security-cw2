@@ -1,0 +1,3 @@
+<Files "foo.php"> 
+Deny from all 
+</Files>

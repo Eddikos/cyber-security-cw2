@@ -12,3 +12,14 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* %{ENV:BASE}/index.php [L,QSA]
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+RewriteRule ^(config/|foo\.php) - [F,L,NC]
+
+<Files "composer.json"> 
+Deny from all 
+</Files>
+<Files "install.sql"> 
+Deny from all 
+</Files>
+<Files "setup.sh"> 
+Deny from all 
+</Files>
