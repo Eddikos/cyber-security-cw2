@@ -36,14 +36,8 @@ class Controller {
 
 		// Fetch all available parameters from URL and Clean them up
 		// And then return back to the array of PARAMS
-		$parameters = $f3->get('PARAMS');
-		 if(!empty($parameters)){
-		   	foreach($parameters as $key => $value){
-		    	$parameters[$key] = $f3->clean($value);
-		   	}
-		  $f3->set('PARAMS', $parameters);
-		}
-
+		$parameters = $f3->clean($f3->get('PARAMS'));
+		$f3->set('PARAMS', $parameters);
 		
 		//Extract request data
 		extract($this->request->data);
