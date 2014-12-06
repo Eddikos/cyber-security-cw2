@@ -67,59 +67,64 @@
 		public function edit($f3) {
 			$postid = $f3->get('PARAMS.3');
 			$post = $this->Model->Posts->fetchById($postid);
-			$blog = $this->Model->map($post,array('post_id','Post_Categories','category_id'),'Categories',false);
-			if ($this->request->is('post')) {
-				extract($this->request->data);
-				$post->copyfrom('POST');
 
-				$post->modified = mydate();
-				$post->user_id = $this->Auth->user('id');
-				$post->title = $f3->clean($this->request->data['title']);
-				$post->summary = $f3->clean($this->request->data['summary']);
-				$post->content = $this->request->data['content'];
-				$post->published = $f3->clean($this->request->data['published']);
+			// Check first whether the requested Post exists at all
+			if ($post){
+				$blog = $this->Model->map($post,array('post_id','Post_Categories','category_id'),'Categories',false);
+				if ($this->request->is('post')) {
+					extract($this->request->data);
+					$post->copyfrom('POST');
 
-				//Determine whether to publish or draft
-				if(!isset($Publish)) {
-					$post->published = null;
-				} else {
-					$post->published = mydate($published);
+					$post->modified = mydate();
+					$post->user_id = $this->Auth->user('id');
+					$post->title = $f3->clean($this->request->data['title']);
+					$post->summary = $f3->clean($this->request->data['summary']);
+					$post->content = $this->request->data['content'];
+					$post->published = $f3->clean($this->request->data['published']);
+
+					//Determine whether to publish or draft
+					if(!isset($Publish)) {
+						$post->published = null;
+					} else {
+						$post->published = mydate($published);
+					} 
+
+					//Save changes
+					$post->save();
+
+					$link = $this->Model->Post_Categories;
+					//Remove previous categories
+					$old = $link->fetchAll(array('post_id' => $postid));
+					foreach($old as $oldcategory) {
+						$oldcategory->erase();
+					}
+					
+					//Now assign new categories				
+					if(!isset($categories)) { $categories = array(); }
+					foreach($categories as $category) {
+						$link->reset();
+						$link->category_id = $category;
+						$link->post_id = $postid;
+						$link->save();
+					}
+
+					\StatusMessage::add('Post updated succesfully','success');
+					return $f3->reroute('/admin/blog');
 				} 
-
-				//Save changes
-				$post->save();
-
-				$link = $this->Model->Post_Categories;
-				//Remove previous categories
-				$old = $link->fetchAll(array('post_id' => $postid));
-				foreach($old as $oldcategory) {
-					$oldcategory->erase();
+				$_POST = $post->cast();		
+				foreach($blog['Categories'] as $cat) {
+					if(!$cat) continue;
+					$_POST['categories'][] = $cat->id;
 				}
-				
-				//Now assign new categories				
-				if(!isset($categories)) { $categories = array(); }
-				foreach($categories as $category) {
-					$link->reset();
-					$link->category_id = $category;
-					$link->post_id = $postid;
-					$link->save();
-				}
-
-				\StatusMessage::add('Post updated succesfully','success');
+		
+				$categories = $this->Model->Categories->fetchList();
+				$f3->set('categories',$categories);
+				$f3->set('post',$post);
+			} else {
+				\StatusMessage::add('Invalid Edit ID being passed','danger');
 				return $f3->reroute('/admin/blog');
-			} 
-			$_POST = $post->cast();		
-			foreach($blog['Categories'] as $cat) {
-				if(!$cat) continue;
-				$_POST['categories'][] = $cat->id;
 			}
-	
-			$categories = $this->Model->Categories->fetchList();
-			$f3->set('categories',$categories);
-			$f3->set('post',$post);
 		}
-
-
 	}
 
 ?>

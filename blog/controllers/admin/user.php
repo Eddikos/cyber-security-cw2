@@ -14,28 +14,36 @@ class User extends AdminController {
 		$bEncrypt = \Bcrypt::instance();
 
 		$id = $f3->get('PARAMS.3');
-		$u = $this->Model->Users->fetch($id);
+		$u = $this->Model->Users->fetchById($id);
+
+		// First check whether the requested User exists at all
+		if ($u){
+			$oldPassword = $u->password;
+		
+			if($this->request->is('post')) {
+				$u->copyfrom('POST');
+
+				// Check whether entered new password is the same as the old one, or wasn't changed at all, 
+				// It is done to avoid Double Hashing
+				if ($this->request->data['password'] !== $oldPassword && $bEncrypt->hash($this->request->data['password'],null, 10) !== $oldPassword) {
+				    $u->password = $bEncrypt->hash($u->password, null, 10);
+				} else { 
+				    $u->password = $oldPassword;
+				}
+
+				$u->save();
+				\StatusMessage::add('User updated succesfully','success');
+				return $f3->reroute('/admin/user');
+			}			
+			$_POST = $u->cast();
+			$f3->set('u',$u);
+		} else {
+			\StatusMessage::add('Invalid user ID being requested','danger');
+			return $f3->reroute('/admin/user');
+		}
 
 		// Store previous password to be used for checking later on
-		$oldPassword = $u->password;
 		
-		if($this->request->is('post')) {
-			$u->copyfrom('POST');
-
-			// Check whether entered new password is the same as the old one, or wasn't changed at all, 
-			// It is done to avoid Double Hashing
-			if ($this->request->data['password'] !== $oldPassword && $bEncrypt->hash($this->request->data['password'],null, 10) !== $oldPassword) {
-			    $u->password = $bEncrypt->hash($u->password, null, 10);
-			} else { 
-			    $u->password = $oldPassword;
-			}
-
-			$u->save();
-			\StatusMessage::add('User updated succesfully','success');
-			return $f3->reroute('/admin/user');
-		}			
-		$_POST = $u->cast();
-		$f3->set('u',$u);
 	}
 
 	public function delete($f3) {

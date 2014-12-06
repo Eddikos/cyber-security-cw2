@@ -51,13 +51,20 @@
 		public function edit($f3) {
 			$categoryid = $f3->get('PARAMS.3');
 			$category = $this->Model->Categories->fetchById($categoryid);
-			if($this->request->is('post')) {
-				$category->title = $f3->clean($this->request->data['title']);
-				$category->save();
-				\StatusMessage::add('Category updated succesfully','success');
+
+			// Check first whether the requested Category exists in Database
+			if ($category){
+				if($this->request->is('post')) {
+					$category->title = $f3->clean($this->request->data['title']);
+					$category->save();
+					\StatusMessage::add('Category updated succesfully','success');
+					return $f3->reroute('/admin/category');
+				}
+				$f3->set('category',$category);
+			} else {
+				\StatusMessage::add('Invalid Category ID being passed','danger');
 				return $f3->reroute('/admin/category');
 			}
-			$f3->set('category',$category);
 		}
 
 

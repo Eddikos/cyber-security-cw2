@@ -22,19 +22,24 @@ class Blog extends Controller {
 		if(empty($id)) {
 			return $f3->reroute('/');
 		}
-		$post = $this->Model->Posts->fetch($id);
-		if(empty($post)) {
+		$post = $this->Model->Posts->fetchById($id);
+
+		// Check whehter the Page requested exists or not
+		if($post) {
+			$blog = $this->Model->map($post,'user_id','Users');
+			$blog = $this->Model->map($post,array('post_id','Post_Categories','category_id'),'Categories',false,$blog);
+
+			$comments = $this->Model->Comments->fetchAll(array('blog_id' => $id));
+			$allcomments = $this->Model->map($comments,'user_id','Users');
+
+			$f3->set('comments',$allcomments);
+			$f3->set('blog',$blog);	
+		} else {
+			\StatusMessage::add('Invalid View ID being passed','danger');
 			return $f3->reroute('/');
 		}
 		
-		$blog = $this->Model->map($post,'user_id','Users');
-		$blog = $this->Model->map($post,array('post_id','Post_Categories','category_id'),'Categories',false,$blog);
-
-		$comments = $this->Model->Comments->fetchAll(array('blog_id' => $id));
-		$allcomments = $this->Model->map($comments,'user_id','Users');
-
-		$f3->set('comments',$allcomments);
-		$f3->set('blog',$blog);		
+			
 	}
 
 	public function reset($f3) {
