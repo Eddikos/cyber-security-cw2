@@ -21,17 +21,22 @@ class Comment extends AdminController {
 
 	public function edit($f3) {
 		$id = $f3->get('PARAMS.3');
-		$comment = $this->Model->Comments->fetch($id);
-		if($this->request->is('post')) {
-			$comment->copyfrom('POST');
-			$comment->save();
-			\StatusMessage::add('Comment updated succesfully','success');
-			return $f3->reroute('/admin/comment');
-		} 
-		$_POST = $comment;
-		$f3->set('comment',$comment);
-	}
+		$comment = $this->Model->Comments->fetchById($id);
 
+		if ($comment){
+			if($this->request->is('post')) {
+				$comment->copyfrom('POST');
+				$comment->save();
+				\StatusMessage::add('Comment updated succesfully','success');
+				return $f3->reroute('/admin/comment');
+			} 
+			$_POST = $comment;
+			$f3->set('comment',$comment);
+		} else {
+			\StatusMessage::add('Invalid Comment ID being passed','danger');
+			return $f3->reroute('/admin/comment');
+		}
+	}
 }
 
 ?>

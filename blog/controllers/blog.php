@@ -61,32 +61,39 @@ class Blog extends Controller {
 		if($this->request->is('post')) {
 			$comment = $this->Model->Comments;
 			$comment->copyfrom('POST');
-			$comment->blog_id = $id;
-			$comment->created = mydate();
-
-			//Moderation of comments
-			if (!empty($this->Settings['moderate']) && $this->Auth->user('level') < 2) {
-				$comment->moderated = 0;
+			if(trim($comment->message) == ''){
+				StatusMessage::add('An empty comment has been submitted','danger');
+				return $f3->reroute('/blog/view/' . $id);
 			} else {
-				$comment->moderated = 1;
-			}
+				$comment->blog_id = $id;
+				$comment->created = mydate();
 
-			//Default subject
-			if(empty($this->request->data['subject'])) {
-				$comment->subject = 'RE: ' . $f3->clean($post->title);
-			} else {
-				$comment->subject = $f3->clean($this->request->data['subject']);
-			}
 
-			$comment->save();
+				//Moderation of comments
+				if (!empty($this->Settings['moderate']) && $this->Auth->user('level') < 2) {
+					$comment->moderated = 0;
+				} else {
+					$comment->moderated = 1;
+				}
 
-			//Redirect
-			if($comment->moderated == 0) {
-				StatusMessage::add('Your comment has been submitted for moderation and will appear once it has been approved','success');
-			} else {
-				StatusMessage::add('Your comment has been posted','success');
+				//Default subject
+				if(empty($this->request->data['subject'])) {
+					$comment->subject = 'RE: ' . $f3->clean($post->title);
+				} else {
+					$comment->subject = $f3->clean($this->request->data['subject']);
+				}
+
+				$comment->save();
+
+				//Redirect
+				if($comment->moderated == 0) {
+					StatusMessage::add('Your comment has been submitted for moderation and will appear once it has been approved','success');
+				} else {
+					StatusMessage::add('Your comment has been posted','success');
+				}
+				return $f3->reroute('/blog/view/' . $id);
 			}
-			return $f3->reroute('/blog/view/' . $id);
+			
 		}
 	}
 
