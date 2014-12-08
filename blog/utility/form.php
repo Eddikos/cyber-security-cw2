@@ -8,7 +8,12 @@ class Form {
 	public function start($options=array()) {
 		$action = isset($options['action']) ? $options['action'] : '';
 		$enctype = (isset($options['type']) && $options['type'] == 'file') ? 'enctype="multipart/form-data"' : ''; //Handle file uploads
-		return '<form role="form" method="post" action="'.$action.'" '.$enctype.'>';	
+		
+		// Generate a Random Unique Number and Pass it as a HIDDEN field inside of the every FORM created, on Start
+		$formToken = uniqid(rand(), true);
+		$_SESSION['formToken'] = $formToken;
+		return '<form role="form" method="post" action="'.$action.'" '.$enctype.'> 
+					<input type="hidden" name="formToken" value="'.$formToken.'">';	
 	}
 
 	public function file($options) {

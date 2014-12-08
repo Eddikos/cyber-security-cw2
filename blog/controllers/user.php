@@ -71,11 +71,17 @@ class User extends Controller {
 				if ($this->Auth->login($username,$password)) {
 					StatusMessage::add('Logged in succesfully','success');
 				
+
+
+				
 					if(isset($_GET['from'])) {
 						$f3->reroute($_GET['from']);
 					} else {
 						$f3->reroute('/');	
 					}
+
+
+
 				} else {
 					StatusMessage::add('Invalid username or password','danger');
 				}

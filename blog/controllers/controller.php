@@ -46,6 +46,21 @@ class Controller {
 		if(isset($beforeCode)) {
 			$f3->process($beforeCode);
 		}
+
+		// First check whether there are any GET or POST methods being send to the page, it will mean that there is a form being submitted
+		if ($this->request->is('post')){
+			// If there is, check if it there is Token Input being set up and it is equal to the SESSION one
+			if (isset($this->request->data['formToken']) && $_SESSION['formToken'] == $this->request->data['formToken']){
+				// Nullify the SESSION
+				$_SESSION['formToken'] = null;
+				$token_check = $this->request->data['formToken'];
+			} else {
+				//Reroute to the Main page if CSRF is detected
+				\StatusMessage::add("You trying to access the site from other place, bad idea", 'danger');
+				return $f3->reroute('/');
+			}
+		}
+		
 	}
 
 	public function afterRoute($f3) {	
