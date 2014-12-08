@@ -62,9 +62,10 @@ class Blog extends Controller {
 			$comment = $this->Model->Comments;
 			$comment->copyfrom('POST');
 
+			$comment->user_id = $this->Auth->user("id");
 			// Check whether the comment has been entered or not
 			if(trim($comment->message) == ''){
-				StatusMessage::add('An empty comment has been submitted','danger');
+				StatusMessage::add('You are trying to submit an empty comment','danger');
 				return $f3->reroute('/blog/view/' . $id);
 			} else {
 				$comment->blog_id = $id;
