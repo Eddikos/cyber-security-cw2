@@ -18,9 +18,21 @@
 	echo $form->add('from',array('type' => 'text', 'value' => $from));
 	echo $form->add('subject',array('type' => 'text'));
 	echo $form->add('message',array('type' => 'textarea'));
+	echo $form->add('captcha');
+	echo $form->captcha();
 	echo $form->add('Send',array('type' => 'submit'));
 
 	echo $form->end();
+
+
+	$url = "https%3A%2F%2Fwww.google.ru%2F";
+
+	if(!filter_var($url, FILTER_VALIDATE_URL)) {
+	  	echo "URL is not valid";
+	} else {
+	  	echo "URL is valid";
+	}
+
 ?>
 </div>
 </div>
