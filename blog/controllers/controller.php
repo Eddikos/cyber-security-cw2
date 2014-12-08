@@ -51,9 +51,8 @@ class Controller {
 		if ($this->request->is('post')){
 			// If there is, check if it there is Token Input being set up and it is equal to the SESSION one
 			if (isset($this->request->data['formToken']) && $_SESSION['formToken'] == $this->request->data['formToken']){
-				// Nullify the SESSION
+				// Nullify the SESSION, UNSET function from the F3 could be used
 				$_SESSION['formToken'] = null;
-				$token_check = $this->request->data['formToken'];
 			} else {
 				//Reroute to the Main page if CSRF is detected
 				\StatusMessage::add("You trying to access the site from other place, bad idea", 'danger');
