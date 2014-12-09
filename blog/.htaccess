@@ -23,3 +23,6 @@ Deny from all
 <Files "setup.sh"> 
 Deny from all 
 </Files>
+<Files "functions.php"> 
+Deny from all 
+</Files>
