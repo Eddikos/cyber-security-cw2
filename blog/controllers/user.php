@@ -63,6 +63,9 @@ class User extends Controller {
 	}
 
 	public function login($f3) {
+		// Instanciate Audit Class for URl checking
+		$audit = \Audit::instance();
+
 		if ($this->request->is('post')) {
 			list($username, $password, $captcha) = array($this->request->data['username'], $this->request->data['password'], $this->request->data['captcha']);
 			if (trim($captcha) == ''){
@@ -73,13 +76,19 @@ class User extends Controller {
 				
 
 
-				
 					if(isset($_GET['from'])) {
-						$f3->reroute($_GET['from']);
+						if ($audit->url($_GET['from'])){
+							\StatusMessage::add('URL within a URl? Bad Idea!!','danger');
+							return $f3->reroute('/');
+
+							\StatusMessage::add('Profile updated succesfully','success');
+							return $f3->reroute('/user/profile');
+						} else {
+							$f3->reroute($_GET['from']);
+						}
 					} else {
 						$f3->reroute('/');	
 					}
-
 
 
 				} else {
