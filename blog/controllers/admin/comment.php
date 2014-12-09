@@ -26,6 +26,7 @@ class Comment extends AdminController {
 		if ($comment){
 			if($this->request->is('post')) {
 				$comment->copyfrom('POST');
+				$comment->subject = $this->request->data['subject'];
 				$comment->save();
 				\StatusMessage::add('Comment updated succesfully','success');
 				return $f3->reroute('/admin/comment');

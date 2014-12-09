@@ -30,9 +30,9 @@
 			if($this->request->is('post')) {
 				$post = $this->Model->Posts;
 				extract($this->request->data);
-				$post->title = $f3->clean($title);
+				$post->title = $title;
 				$post->content = $content;
-				$post->summary = $f3->clean($summary);
+				$post->summary = $summary;
 				$post->user_id = $this->Auth->user('id');	
 				$post->created = $post->modified = mydate();
 
@@ -77,10 +77,10 @@
 
 					$post->modified = mydate();
 					$post->user_id = $this->Auth->user('id');
-					$post->title = $f3->clean($this->request->data['title']);
-					$post->summary = $f3->clean($this->request->data['summary']);
+					$post->title = $this->request->data['title'];
+					$post->summary = $this->request->data['summary'];
 					$post->content = $this->request->data['content'];
-					$post->published = $f3->clean($this->request->data['published']);
+					$post->published = $this->request->data['published'];
 
 					//Determine whether to publish or draft
 					if(!isset($Publish)) {

@@ -18,15 +18,14 @@
 			if($this->request->is('post')) {
 				$category = $this->Model->Categories;
 				
-
-				//$pagename = trim($f3->clean(strtolower(str_replace(" ","_",$this->request->data['title']))));
-				$categoryName = trim($f3->clean(strtolower($this->request->data['title'])));
+				$categoryName = trim(strtolower($this->request->data['title']));
 
 				if ($categoryName == ''){
 					\StatusMessage::add('Empty Category name is not accepted','danger');
 					return $f3->reroute('/admin/category');
 				} else {
-					$category->title = $f3->clean($this->request->data['title']);
+					// clean before passing
+					$category->title = $this->request->data['title'];
 					$category->save();
 
 					\StatusMessage::add('Category added succesfully','success');
@@ -55,7 +54,8 @@
 			// Check first whether the requested Category exists in Database
 			if ($category){
 				if($this->request->is('post')) {
-					$category->title = $f3->clean($this->request->data['title']);
+					// clean before passing
+					$category->title = $this->request->data['title'];
 					$category->save();
 					\StatusMessage::add('Category updated succesfully','success');
 					return $f3->reroute('/admin/category');

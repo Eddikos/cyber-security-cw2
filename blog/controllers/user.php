@@ -121,7 +121,7 @@ class User extends Controller {
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');
 
-			$u->displayname = $f3->clean($this->request->data['displayname']);
+			$u->displayname = $this->request->data['displayname'];
 
 
 			//Handle avatar upload
