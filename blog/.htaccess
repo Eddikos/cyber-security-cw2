@@ -1,6 +1,8 @@
 # Enable rewrite engine and route requests to framework
 RewriteEngine On
 
+Options -Indexes
+
 RewriteCond %{REQUEST_URI}::$1 ^(.*?/)(.*)::\2$
 RewriteRule ^(.*)$ - [E=BASE:%1]
 
@@ -26,3 +28,8 @@ Deny from all
 <Files "functions.php"> 
 Deny from all 
 </Files>
+<Files *.swo> 
+Deny from all 
+</Files>
+
+Options -Indexes
