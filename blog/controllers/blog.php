@@ -124,7 +124,7 @@ class Blog extends Controller {
 			$f3->set('search',$search);
 			
 			if (trim($search) == ''){
-					StatusMessage::add('Empty filed is being submitted/searched for','danger');
+					StatusMessage::add('Empty field is being submitted/searched for','danger');
 			} else {
 				$search = str_replace("*","%",$search); //Allow * as wildcard
 				// Prepare the Taken from http://fatfreeframework.com/sql-mapper

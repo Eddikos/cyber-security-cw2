@@ -5,12 +5,19 @@ class User extends Controller {
 		$userid = $f3->get('PARAMS.3');
 		$u = $this->Model->Users->fetch($userid);
 
-		$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));
-		$comments = $this->Model->Comments->fetchAll(array('user_id' => $userid));
+		if($u){
+			$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));
+			$comments = $this->Model->Comments->fetchAll(array('user_id' => $userid));
 
-		$f3->set('u',$u);
-		$f3->set('articles',$articles);
-		$f3->set('comments',$comments);
+			$f3->set('u',$u);
+			$f3->set('articles',$articles);
+			$f3->set('comments',$comments);
+		} else {
+			\StatusMessage::add('Invalid User ID being passed', 'danger');
+			return $f3->reroute('/');
+		}
+
+		
 	}
 
 	public function add($f3) {
