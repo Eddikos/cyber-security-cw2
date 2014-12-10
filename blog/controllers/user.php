@@ -124,10 +124,14 @@ class User extends Controller {
 
 		// Store previous password to be used for checking later on
 		$oldPassword = $u->password;
+		//$oldpass = $u->password; was within the patch as well
 
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');
 
+			// Was within the latest patch 
+			if(empty($u->password)) { $u->password = $oldpass; }
+			
 			$u->displayname = $this->request->data['displayname'];
 
 
