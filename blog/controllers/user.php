@@ -57,7 +57,8 @@ class User extends Controller {
 					}
 
 					// Encrypt the password before passing it to the database
-					$user->password = $bEncrypt->hash($user->password,null, 10);
+					$salt = uniqid(rand(), true);
+					$user->password = $bEncrypt->hash($user->password,$salt, 10);
 					$user->save();	
 					StatusMessage::add('Registration complete','success');
 					return $f3->reroute('/user/login');
@@ -123,14 +124,13 @@ class User extends Controller {
 		$u = $this->Model->Users->fetch($id);
 
 		// Store previous password to be used for checking later on
-		$oldPassword = $u->password;
-		//$oldpass = $u->password; was within the patch as well
+		$oldPassword = $u->password;  //  was within the patch as well
 
 		if($this->request->is('post')) {
 			$u->copyfrom('POST');
 
 			// Was within the latest patch 
-			if(empty($u->password)) { $u->password = $oldpass; }
+			if(empty($u->password)) { $u->password = $oldPassword; }
 			
 			$u->displayname = $this->request->data['displayname'];
 
