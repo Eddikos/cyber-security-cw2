@@ -70,7 +70,7 @@ class Blog extends Controller {
 			} else {
 				$comment->blog_id = $id;
 				$comment->created = mydate();
-
+				$comment->message = $this->request->data['message'];
 
 				//Moderation of comments
 				if (!empty($this->Settings['moderate']) && $this->Auth->user('level') < 2) {

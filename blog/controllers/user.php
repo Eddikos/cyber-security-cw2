@@ -82,7 +82,7 @@ class User extends Controller {
 					StatusMessage::add('Logged in succesfully','success');
 				
 
-
+					// Trying to prevent Open Redirect 
 					if(isset($_GET['from'])) {
 						if ($audit->url($_GET['from'])){
 							\StatusMessage::add('URL within a URl? Bad Idea!!','danger');

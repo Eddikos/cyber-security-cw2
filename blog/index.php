@@ -2,7 +2,7 @@
 
 //Start session
 session_name("RobPress");
-//session_start();
+session_start();
 
 //Load framework
 $f3=require('lib/base.php');

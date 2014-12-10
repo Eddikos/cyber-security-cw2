@@ -56,7 +56,7 @@ class Controller {
 
 				// Because we are within form it means there are some parameters being passed
 				// Clean them before actual use
-				$this->request->data = $f3->clean($this->request->data);
+				$this->request->data = $f3->clean($this->request->data,'ul,b,i,u,s,sub,sup,body,strong,em,a,ol,li,div,p,blockqoute,div,span,img,table,tr,td,tbody,thead,iframe');
 
 			} else {
 				//Reroute to the Main page if CSRF is detected
