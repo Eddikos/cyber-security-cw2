@@ -130,7 +130,7 @@ class User extends Controller {
 			$u->copyfrom('POST');
 
 			// Was within the latest patch 
-			if(empty($u->password)) { $u->password = $oldPassword; }
+			if(trim($u->password) == '') { $u->password = $oldPassword; }
 			
 			$u->displayname = $this->request->data['displayname'];
 
@@ -164,11 +164,14 @@ class User extends Controller {
 
 			// Check whether entered new password is the same as the old one, or wasn't changed at all, 
 			// It is done to avoid Double Hashing
-			if ($this->request->data['password'] !== $oldPassword && $bEncrypt->hash($this->request->data['password'],null, 10) !== $oldPassword) {
-			    $u->password = $bEncrypt->hash($u->password, null, 10);
-			} else { 
+			 if (strlen($_POST['password']) !== 0) {
+			    $salt = uniqid(rand(), true);
+			    $u->password = $bEncrypt->hash($u->password, $salt, 10);
+			   }else{
 			    $u->password = $oldPassword;
-			}
+			   }
+
+
 
 			$u->save();
 			\StatusMessage::add('Profile updated succesfully','success');
