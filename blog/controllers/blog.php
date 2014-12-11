@@ -37,23 +37,23 @@ class Blog extends Controller {
 		} else {
 			\StatusMessage::add('Invalid View ID being passed','danger');
 			return $f3->reroute('/');
-		}
-		
-			
+		}			
 	}
 
-	public function reset($f3) {
-		$allposts = $this->Model->Posts->fetchAll();
-		$allcategories = $this->Model->Categories->fetchAll();
-		$allcomments = $this->Model->Comments->fetchAll();
-		$allmaps = $this->Model->Post_Categories->fetchAll();
-		foreach($allposts as $post) $post->erase();
-		foreach($allcategories as $cat) $cat->erase();
-		foreach($allcomments as $com) $com->erase();
-		foreach($allmaps as $map) $map->erase();
-		StatusMessage::add('Blog has been reset');
-		return $f3->reroute('/');
-	}
+	// Comment out the unnecessary command which User might access to EMPTY the whole website
+	
+	// public function reset($f3) {
+	// 	$allposts = $this->Model->Posts->fetchAll();
+	// 	$allcategories = $this->Model->Categories->fetchAll();
+	// 	$allcomments = $this->Model->Comments->fetchAll();
+	// 	$allmaps = $this->Model->Post_Categories->fetchAll();
+	// 	foreach($allposts as $post) $post->erase();
+	// 	foreach($allcategories as $cat) $cat->erase();
+	// 	foreach($allcomments as $com) $com->erase();
+	// 	foreach($allmaps as $map) $map->erase();
+	// 	StatusMessage::add('Blog has been reset');
+	// 	return $f3->reroute('/');
+	// }
 
 	public function comment($f3) {
 		$id = $f3->get('PARAMS.3');
