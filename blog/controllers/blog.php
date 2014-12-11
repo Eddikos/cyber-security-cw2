@@ -57,17 +57,16 @@ class Blog extends Controller {
 
 	public function comment($f3) {
 		$id = $f3->get('PARAMS.3');
-		$post = $this->Model->Posts->fetch($id);
+		$post = $this->Model->Posts->fetchById($id);
 		if($this->request->is('post')) {
-			$comment = $this->Model->Comments;
-			$comment->copyfrom('POST');
-
-			$comment->user_id = $this->Auth->user("id");
-			// Check whether the comment has been entered or not
-			if(trim($comment->message) == ''){
+			if (trim($this->request->data['message']) == ''){
 				StatusMessage::add('You are trying to submit an empty comment','danger');
 				return $f3->reroute('/blog/view/' . $id);
 			} else {
+				$comment = $this->Model->Comments;
+				$comment->copyfrom('POST');
+				// Not to use HIDDEN Field anymore
+				$comment->user_id = $this->Auth->user("id");
 				$comment->blog_id = $id;
 				$comment->created = mydate();
 				$comment->message = $this->request->data['message'];
@@ -81,7 +80,7 @@ class Blog extends Controller {
 
 				//Default subject
 				if(empty($this->request->data['subject'])) {
-					$comment->subject = 'RE: ' .$post->title;
+					$comment->subject = 'RE: ' . $post->title;
 				} else {
 					$comment->subject = $this->request->data['subject'];
 				}
@@ -96,7 +95,6 @@ class Blog extends Controller {
 				}
 				return $f3->reroute('/blog/view/' . $id);
 			}
-			
 		}
 	}
 
