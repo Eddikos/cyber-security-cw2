@@ -3,7 +3,7 @@ class User extends Controller {
 	
 	public function view($f3) {
 		$userid = $f3->get('PARAMS.3');
-		$u = $this->Model->Users->fetch($userid);
+		$u = $this->Model->Users->fetchById(array('user_id'=>$userid));
 
 		if($u){
 			$articles = $this->Model->Posts->fetchAll(array('user_id' => $userid));
@@ -133,7 +133,7 @@ class User extends Controller {
 			if(trim($u->password) == '') { $u->password = $oldPassword; }
 			
 			$u->displayname = $this->request->data['displayname'];
-
+			$u->bio = $this->request->data['bio'];
 
 			//Handle avatar upload
 			// List of allowed extensions to be uploaded
@@ -164,12 +164,12 @@ class User extends Controller {
 
 			// Check whether entered new password is the same as the old one, or wasn't changed at all, 
 			// It is done to avoid Double Hashing
-			 if (strlen($_POST['password']) !== 0) {
+			if (strlen($_POST['password']) !== 0) {
 			    $salt = uniqid(rand(), true);
 			    $u->password = $bEncrypt->hash($u->password, $salt, 10);
-			   }else{
+			}else{
 			    $u->password = $oldPassword;
-			   }
+			}
 
 
 
