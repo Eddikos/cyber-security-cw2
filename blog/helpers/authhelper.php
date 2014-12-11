@@ -12,7 +12,16 @@
 			$f3=Base::instance();				
 
 			//Ignore if already running session	
-			if($f3->exists('SESSION.user.id')) return;
+			if($f3->exists('SESSION.user.id')){
+				$userSession = $f3->get('SESSION.user.id');
+				$user = $this->controller->db->query("SELECT * FROM users WHERE session = '$userSession'");
+				if(!empty($user[0])){
+					return;
+				} else {
+					$f3->clear('SESSION');
+				}
+				
+			} 
 
 			//Log user back in from cookie
 			if($f3->exists('COOKIE.RobPress_User')) {
@@ -66,7 +75,8 @@
 			$f3=Base::instance();							
 
 			//Kill the session
-			session_destroy();
+			//session_destroy();
+			$f3->clear('SESSION');
 
 			//Kill the cookie
 			setcookie('RobPress_User','',time()-3600,'/');
@@ -78,19 +88,23 @@
 			//Remove previous session
 			//session_destroy();
 			$f3->clear('SESSION');
+			$user_id = $user['id'];
 
 			//Setup new session
-			session_id(md5($user['id']));
+			// Using a unique ID and hashing it 
+			$session = uniqid(rand(),true);
+			session_id(md5($session));
+			$update = $this->controller->db->query("UPDATE users SET session = '$session' WHERE id = $user_id");   
 
 			//Setup cookie for storing user details and for relogging in
 			//setcookie('RobPress_User',base64_encode($user),time()+3600*24*30,'/');
 			//Setup cookie for storing user details and for relogging in
 			//setcookie('RobPress_User',base64_encode(serialize($user)),time()+3600*24*30,'/');
-			$dude = $user['id'];
-		   	$toadd = uniqid(rand(),true);
-		   	//store the session in the database
-		   	$update = $this->controller->db->query("UPDATE users SET cookie = '$toadd' WHERE id = $dude");   
-		   	setcookie('RobPress_User',$toadd,time()+3600*24*30,'/');
+			
+		   	$cookie = uniqid(rand(),true);
+		   	//store the cookie in the database
+		   	$update = $this->controller->db->query("UPDATE users SET cookie = '$cookie' WHERE id = $user_id");   
+		   	setcookie('RobPress_User',$cookie,time()+3600*24*30,'/');
 			//And begin!
 			new Session();
 		}
