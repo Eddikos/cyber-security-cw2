@@ -20,6 +20,12 @@
 			$cats = $this->Model->Post_Categories->fetchAll(array('post_id' => $postid));
 			foreach($cats as $cat) {
 				$cat->erase();
+			}
+
+			//Remove from categories
+			$comments = $this->Model->Post_Comments->fetchAll(array('post_id' => $postid));
+			foreach($comments as $comment) {
+				$comment->erase();
 			}	
 
 			\StatusMessage::add('Post deleted succesfully','success');
