@@ -16,8 +16,14 @@
 
 			//Log user back in from cookie
 			if($f3->exists('COOKIE.RobPress_User')) {
-				$user = unserialize(base64_decode($f3->get('COOKIE.RobPress_User')));
-				$this->forceLogin($user);
+				//$user = unserialize(base64_decode($f3->get('COOKIE.RobPress_User')));
+				$userCookie = $f3->get('COOKIE.RobPress_User');
+				//$user = $this->controller->Model->users->fetch(array('cookie' => $userCookie));
+				$user = $this->controller->db->query("SELECT * FROM users WHERE cookie = '$userCookie'");
+				//var_dump($user);
+				if(!empty($user[0])){
+					$this->forceLogin($user[0]);
+				}
 			}
 		}		
 
@@ -68,15 +74,23 @@
 
 		/** Set up the session for the current user */
 		public function setupSession($user) {
+			$f3=Base::instance();
 			//Remove previous session
-			session_destroy();
+			//session_destroy();
+			$f3->clear('SESSION');
 
 			//Setup new session
 			session_id(md5($user['id']));
 
 			//Setup cookie for storing user details and for relogging in
-			setcookie('RobPress_User',base64_encode(serialize($user)),time()+3600*24*30,'/');
-
+			//setcookie('RobPress_User',base64_encode($user),time()+3600*24*30,'/');
+			//Setup cookie for storing user details and for relogging in
+			//setcookie('RobPress_User',base64_encode(serialize($user)),time()+3600*24*30,'/');
+			$dude = $user['id'];
+		   	$toadd = uniqid(rand(),true);
+		   	//store the session in the database
+		   	$update = $this->controller->db->query("UPDATE users SET cookie = '$toadd' WHERE id = $dude");   
+		   	setcookie('RobPress_User',$toadd,time()+3600*24*30,'/');
 			//And begin!
 			new Session();
 		}
